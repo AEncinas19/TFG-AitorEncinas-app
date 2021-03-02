@@ -18,10 +18,19 @@ function locationdetected(state = false, action = {}) {
     }
 }
 
+function token(state = '', action = {}){
+    switch(action.type){
+        case 'ARRIVE_TOKEN':
+            return action.payload.token;
+        default:
+            return state;
+    }
+}
 
 const GlobalState = (combineReducers({
     activated,
-    locationdetected
+    locationdetected,
+    token
 }));
 
 export default GlobalState;

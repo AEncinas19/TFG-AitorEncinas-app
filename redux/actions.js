@@ -5,3 +5,7 @@ export function activateSearch(){
 export function localFound(){
     return {type: 'LOCAL_FOUND'}
 }
+
+export function arriveToken(token){
+    return {type: 'ARRIVE_TOKEN', payload:{token}}
+}
