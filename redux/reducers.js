@@ -12,7 +12,25 @@ function activated(state = false, action = {}) {
 function locationdetected(state = false, action = {}) {
     switch(action.type) {
         case 'LOCAL_FOUND':
-            return true;
+            return !state;
+        default:
+            return state;
+    }
+}
+
+function latitud(state = 0, action = {}) {
+    switch(action.type) {
+        case 'ACTUAL_LOCATION':
+            return action.payload.latitud;
+        default:
+            return state;
+    }
+}
+
+function longitud(state = 0, action = {}) {
+    switch(action.type) {
+        case 'ACTUAL_LOCATION':
+            return action.payload.longitud;
         default:
             return state;
     }
@@ -29,6 +47,8 @@ function token(state = '', action = {}){
 
 const GlobalState = (combineReducers({
     activated,
+    longitud,
+    latitud,
     locationdetected,
     token
 }));

@@ -1,11 +1,12 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {View, TouchableHighlight, Text, StyleSheet} from 'react-native';
-import { activateSearch, arriveToken } from '../redux/actions';
+import { activateSearch, actualLocation, arriveToken } from '../redux/actions';
 import { Alert, Platform } from 'react-native'
 import * as Permissions from 'expo-permissions';
 import * as Linking from 'expo-linking';
 import * as Notifications from 'expo-notifications';
+import * as Location from 'expo-location';
 
 
 const hasNotificationPermission = async () => {
@@ -14,10 +15,6 @@ const hasNotificationPermission = async () => {
     let finalStatus = existingStatus;
 
     if (finalStatus === 'granted') return true;
-    if (existingStatus !== 'granted') {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
-    }
     if (finalStatus !== 'granted') {
       Alert.alert(
         'Warning',
@@ -41,10 +38,40 @@ const hasNotificationPermission = async () => {
   }
 }
 
+const hasGeolocationPermission = async () => {
+  try {
+    const { status } = await Location.requestPermissionsAsync();
+    let finalStatus = status
+    if (finalStatus === 'granted') return true;
+    if (finalStatus !== 'granted') {
+      Alert.alert(
+        'Warning',
+        'You will not search if you do not enable geolocation. If you would like to search, please enable geolocation for Fin in your settings.',
+        [
+          { text: 'Cancel'},
+          // we can automatically open our app in their settings
+          // so there's less friction in turning geolocation on
+          { text: 'Enable Geolocation', onPress: () => Platform.OS === 'ios' ? Linking.openURL('app-settings:') : Linking.openSettings() }
+        ]
+      )
+      return false;
+      
+    }
+  } catch (error) {
+    Alert.alert(
+      'Error',
+      'Something went wrong while check your geolocation permissions, please try again later.'
+    );
+    return false;
+  }
+}
+
+
 class IndexScreen extends React.Component {
 
     async componentDidMount() {
         hasNotificationPermission()
+        hasGeolocationPermission()
         this.registerForPushNotificationsAsync()
 
         Notifications.addNotificationReceivedListener(notification => {console.log(notification)})
@@ -52,8 +79,14 @@ class IndexScreen extends React.Component {
     }
 
     activate = async () => {
-        let permission = await hasNotificationPermission();
-        if (permission){
+        let Notpermission = await hasNotificationPermission();
+        let Geopermission = await hasGeolocationPermission();
+        if (Notpermission && Geopermission){
+          if (!this.props.activated){
+          this.getPosition()
+          this.props.dispatch(activateSearch())
+          }
+          else
             this.props.dispatch(activateSearch())
         }
         else{
@@ -67,6 +100,7 @@ class IndexScreen extends React.Component {
                 <Text style={{flex:1, fontSize: 35 }}> Welcome to this demo App </Text> 
                 <Text style={{flex:1, fontSize: 35 }}> Press  'Start Search'</Text> 
                 <Text style={{flex:1, fontSize: 20 }}> Your expo push token: {this.props.token}</Text> 
+                <Text style={{flex:1, fontSize: 20 }}> Geolocation & Push notifications: {this.props.activated? "true" : "false"} </Text> 
                 <TouchableHighlight style={styles.button} onPress = {() => this.activate()}>
                     <Text> {this.props.activated ? "Stop Search" : "Start Search"}</Text>
                 </TouchableHighlight>
@@ -93,6 +127,17 @@ class IndexScreen extends React.Component {
     }
     catch(error){
       console.log("No se ha podido obtener el token para push notifications")
+    }
+  }
+
+  async getPosition() {
+    try{
+      const { coords } = await Location.getCurrentPositionAsync({});
+      let position = coords;
+      this.props.dispatch(actualLocation(position.latitude, position.longitude))
+    } 
+    catch (error) {
+      console.log("getPosition -> error", error);
     }
   }
 

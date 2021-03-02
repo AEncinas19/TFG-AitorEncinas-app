@@ -8,23 +8,17 @@ import AppDemo from './AppDemo';
 
 class AppScreen extends React.Component {
 
-    async componentDidMount() {
-         return
-    }
-
     render() {
-        if (!this.props.locationdetected) {
+        if (this.props.activated) {
+            return (
+                <View style={{ flex:1, flexDirection: 'column', alignItems:'center', justifyContent:'space-around'}}>
+                    <Text style={{flex:1, fontSize: 50 }}>Geolocation: LATITUD:{this.props.latitud} LONGITUD:{this.props.longitud} </Text> 
+                </View>
+            )
+        }
+        else {
             return <View><Text>No place detected</Text></View>
         } 
-        else {
-            return (
-                //<SafeAreaView>
-                <View  className="App">
-                    <AppDemo  
-                        />
-                    </View>
-            )
-            }
     }
 }
 

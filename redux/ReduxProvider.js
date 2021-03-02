@@ -18,6 +18,8 @@ export default class ReduxProvider extends React.Component {
     constructor(props) {
         super(props);
         this.initialState = {
+            latitud: 0,
+            longitud: 0,
             locationdetected: false,
             activated: false,
             token: ""
