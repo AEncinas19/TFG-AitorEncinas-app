@@ -69,30 +69,41 @@ const hasGeolocationPermission = async () => {
 
 class IndexScreen extends React.Component {
 
-    async componentDidMount() {
-        hasNotificationPermission()
-        hasGeolocationPermission()
-        this.registerForPushNotificationsAsync()
+  async componentDidMount() {
+    hasNotificationPermission()
+    hasGeolocationPermission()
+    this.registerForPushNotificationsAsync()
 
-        Notifications.addNotificationReceivedListener(notification => {console.log(notification)})
-        Notifications.addNotificationResponseReceivedListener( response => this.props.navigation.navigate('App')) /*cuando el usuario pulsa encima, cambia de pantalla*/
-    }
+    this.myInterval = setInterval(() => {
+      if (this.props.activated){
+        this.getPosition();
+        console.log("Se ha activado")
+      }
+    }, 30000)
 
-    activate = async () => {
-        let Notpermission = await hasNotificationPermission();
-        let Geopermission = await hasGeolocationPermission();
-        if (Notpermission && Geopermission){
-          if (!this.props.activated){
-          this.getPosition()
-          this.props.dispatch(activateSearch())
-          }
-          else
-            this.props.dispatch(activateSearch())
-        }
-        else{
-            return
-        }
+    Notifications.addNotificationReceivedListener(notification => {console.log(notification)})
+    Notifications.addNotificationResponseReceivedListener( response => this.props.navigation.navigate('App')) /*cuando el usuario pulsa encima, cambia de pantalla*/
+  }
+
+  async componentWillUnmount(){
+    clearInterval(this.myInterval)
+  }
+
+  activate = async () => {
+    let Notpermission = await hasNotificationPermission();
+    let Geopermission = await hasGeolocationPermission();
+    if (Notpermission && Geopermission){
+      if (!this.props.activated){
+        this.props.dispatch(activateSearch())
+        this.getPosition()
+      }
+      else
+        this.props.dispatch(activateSearch())
     }
+    else{
+        return
+    }
+  }
 
     render() {
         return(
@@ -135,6 +146,7 @@ class IndexScreen extends React.Component {
       const { coords } = await Location.getCurrentPositionAsync({});
       let position = coords;
       this.props.dispatch(actualLocation(position.latitude, position.longitude))
+      console.log(this.props.latitud)
     } 
     catch (error) {
       console.log("getPosition -> error", error);
