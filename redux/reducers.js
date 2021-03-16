@@ -18,6 +18,33 @@ function locationdetected(state = false, action = {}) {
     }
 }
 
+function logState(state = "", action = {}) {
+    switch(action.type) {
+        case 'LOG_STATE':
+            return action.payload.log;
+        default:
+            return state;
+    }
+}
+
+function logged(state = false, action = {}) {
+    switch(action.type) {
+        case 'LOGGING':
+            return !state;
+        default:
+            return state;
+    }
+}
+
+function username(state = "", action = {}) {
+    switch(action.type) {
+        case 'LOGGING':
+            return action.payload.username;
+        default:
+            return state;
+    }
+}
+
 function latitud(state = 0, action = {}) {
     switch(action.type) {
         case 'ACTUAL_LOCATION':
@@ -50,7 +77,10 @@ const GlobalState = (combineReducers({
     longitud,
     latitud,
     locationdetected,
-    token
+    token,
+    logState,
+    logged,
+    username
 }));
 
 export default GlobalState;

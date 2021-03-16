@@ -13,3 +13,11 @@ export function localFound(){
 export function arriveToken(token){
     return {type: 'ARRIVE_TOKEN', payload:{token}}
 }
+
+export function logging(username){
+    return {type: 'LOGGING', payload:{username}}
+}
+
+export function stateLog(log){
+    return {type: 'LOG_STATE', payload:{log}}
+}

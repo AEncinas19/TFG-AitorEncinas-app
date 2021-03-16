@@ -73,16 +73,15 @@ class IndexScreen extends React.Component {
     hasNotificationPermission()
     hasGeolocationPermission()
     this.registerForPushNotificationsAsync()
-
+    Notifications.addNotificationReceivedListener(notification => {this.props.navigation.navigate('App')})
+    Notifications.addNotificationResponseReceivedListener( response => this.props.navigation.navigate('App')) /*cuando el usuario pulsa encima, cambia de pantalla*/
+    
     this.myInterval = setInterval(() => {
       if (this.props.activated){
         this.getPosition();
         console.log("Se ha activado")
       }
     }, 30000)
-
-    Notifications.addNotificationReceivedListener(notification => {console.log(notification)})
-    Notifications.addNotificationResponseReceivedListener( response => this.props.navigation.navigate('App')) /*cuando el usuario pulsa encima, cambia de pantalla*/
   }
 
   async componentWillUnmount(){
@@ -96,9 +95,11 @@ class IndexScreen extends React.Component {
       if (!this.props.activated){
         this.props.dispatch(activateSearch())
         this.getPosition()
+        this.sendToken()
       }
       else
         this.props.dispatch(activateSearch())
+        this.deleteToken()
     }
     else{
         return
@@ -106,9 +107,10 @@ class IndexScreen extends React.Component {
   }
 
     render() {
+      if (this.props.logged){
         return(
             <View style={{ flex:1, flexDirection: 'column', alignItems:'center', justifyContent:'space-around'}}>
-                <Text style={{flex:1, fontSize: 35 }}> Welcome to this demo App </Text> 
+                <Text style={{flex:1, fontSize: 35 }}> Welcome {this.props.username} to this demo App </Text> 
                 <Text style={{flex:1, fontSize: 35 }}> Press  'Start Search'</Text> 
                 <Text style={{flex:1, fontSize: 20 }}> Your expo push token: {this.props.token}</Text> 
                 <Text style={{flex:1, fontSize: 20 }}> Geolocation & Push notifications: {this.props.activated? "true" : "false"} </Text> 
@@ -117,6 +119,14 @@ class IndexScreen extends React.Component {
                 </TouchableHighlight>
             </View>
         )
+        }
+        else{
+          return(
+            <View style={{ flex:1, flexDirection: 'column', alignItems:'center', justifyContent:'space-around'}}>
+                <Text style={{flex:1, fontSize: 35 }}> You need to be logged </Text> 
+            </View>
+          )
+        }
     }
 
 
@@ -152,7 +162,30 @@ class IndexScreen extends React.Component {
       console.log("getPosition -> error", error);
     }
   }
+}
 
+async function sendToken(){
+  await fetch('', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Accept-encoding': 'gzip, deflate',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(this.props.token),
+  });
+}
+
+async function deleteToken(){
+  await fetch('', {
+    method: 'DELETE',
+    headers: {
+      Accept: 'application/json',
+      'Accept-encoding': 'gzip, deflate',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(this.props.token),
+  });
 }
 
 const styles = StyleSheet.create({
@@ -169,11 +202,11 @@ const styles = StyleSheet.create({
 }
     );
 
-    function mapStateToProps(state) {
-        return {
-          ...state
-        };
-    }
+function mapStateToProps(state) {
+    return {
+      ...state
+    };
+}
       
       //export default App;
 export default connect(mapStateToProps)(IndexScreen);

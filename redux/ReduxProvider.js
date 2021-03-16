@@ -1,14 +1,14 @@
 import {Provider} from 'react-redux';
 import GlobalState from './reducers';
 import { createStore } from 'redux';
-
+import {View} from 'react-native';
 
 import{NavigationContainer, StackActions} from '@react-navigation/native';
 import{ createMaterialTopTabNavigator} from'@react-navigation/material-top-tabs';
+
 import IndexScreen from '../components/IndexScreen';
 import AppScreen from '../components/AppScreen';
-
-import {SafeAreaView} from "react-native-safe-area-context";
+import LoggingScreen from '../components/LoggingScreen';
 
 import React from 'react';
 
@@ -22,17 +22,21 @@ export default class ReduxProvider extends React.Component {
             longitud: 0,
             locationdetected: false,
             activated: false,
-            token: ""
+            token: "",
+            logState: "",
+            logged: false,
+            username: ""
         };
         this.store = this.configureStore();
     }
     render(){
         return (
                 <Provider store={ this.store }>
+                    <View style={{height: 10}}></View> 
                     <NavigationContainer>
-                        <Tab.Navigator initialRouteName="Home">
-                            <Tab.Screen name="Home" component={IndexScreen} />
-                            <Tab.Screen name="App" component={AppScreen} visible={this.props.activated} />
+                        <Tab.Navigator initialRouteName="LogPage">
+                            <Tab.Screen name="LogPage" component={LoggingScreen} />
+                            <Tab.Screen name="App" component={AppScreen} />
                         </Tab.Navigator>
                     </NavigationContainer>
                 </Provider>
