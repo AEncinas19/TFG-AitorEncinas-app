@@ -15,7 +15,7 @@ class LoggingScreen extends React.Component {
     render() {
         if (this.props.logged) {
             return (
-                <View className="IndexScreen">
+                <View style= {{flex:1}} className="IndexScreen">
                     <IndexScreen />
                 </View>
             )

@@ -17,18 +17,38 @@ export default class LogInScreen extends React.Component{
     }
 
     async registerToServer() {
-        let response = await fetch('https:localhost:8000/',{
-            method: 'POST',
-            HEADERS: {
-                'Accept':'application/json',
-                'Content-Type': 'application/json',
-            }
-        });
-        let responsed = await response.json();
-        console.log(responsed)
-        alert("Your user has been created succesfully")
-        this.onUserNameChange("");
-        this.onPasswordChange("");
+
+    let comprobacion = (this.state.userName.trim().length > 5) && (this.state.password.trim().length > 5);
+    console.log(comprobacion)
+
+    if (comprobacion){
+
+        try{
+            let response = await fetch('http://a8141bcf5159.ngrok.io/register',{
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Accept-encoding': 'gzip, deflate',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username : this.state.userName,
+                    password : this.state.password,
+                })
+            });
+
+            let responsed = await response.json();
+            alert(responsed.error || responsed.success)
+            this.TextInputName.clear();
+            this.TextInputPassword.clear();
+        }
+        catch(error){
+            console.log(error)
+        }
+    }
+    else{
+            alert("username y password deben tener una longitud superior a 6 caracteres")
+        }
     }
 
 
@@ -38,13 +58,13 @@ export default class LogInScreen extends React.Component{
             <View style={{ flex:1, flexDirection:'column', alignItems:'center', justifyContent:'center' }}>
                 <View>
                     <Text>Username:</Text>
-                    <TextInput style={{height:70, alignSelf:'stretch', fontSize:25, padding:5}}onChangeText={this.onUserNameChange}/>
+                    <TextInput ref={inputName => {this.TextInputName = inputName}} style={{height:70, alignSelf:'stretch', fontSize:25, padding:5}}onChangeText={this.onUserNameChange}/>
                 </View>
                 <View>
                     <Text>Password:</Text>
-                    <TextInput style={{height:70, alignSelf:'stretch', fontSize:25, padding:5}}onChangeText={this.onPasswordChange}/>
+                    <TextInput ref={inputPassword => {this.TextInputPassword = inputPassword}} style={{height:70, alignSelf:'stretch', fontSize:25, padding:5}}onChangeText={this.onPasswordChange}/>
                 </View>
-                <TouchableHighlight style={styles.button} onPress = {() => this.props.registerToServer()}>
+                <TouchableHighlight style={styles.button} onPress = {() => this.registerToServer()}>
                     <Text>Sign In</Text>
                 </TouchableHighlight>
                 <TouchableHighlight style={styles.button} onPress = {() => this.props.onChangeState()}>

@@ -79,6 +79,7 @@ class IndexScreen extends React.Component {
     this.myInterval = setInterval(() => {
       if (this.props.activated){
         this.getPosition();
+        // this.sendLocation();
         console.log("Se ha activado")
       }
     }, 30000)
@@ -164,19 +165,31 @@ class IndexScreen extends React.Component {
   }
 }
 
-async function sendToken(){
-  await fetch('', {
+/* async function sendToken(){
+  await fetch('/pushtoken', {
     method: 'POST',
     headers: {
       Accept: 'application/json',
       'Accept-encoding': 'gzip, deflate',
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(this.props.token),
+    body: JSON.stringify({pushtoken: this.props.token}),
   });
-}
+} */
 
-async function deleteToken(){
+/* async function sendLocation(){
+  await fetch('/location', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Accept-encoding': 'gzip, deflate',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({latitud: this.props.latitud, longitud: this.props.longitud}),
+  });
+} */
+
+/* async function deleteToken(){
   await fetch('', {
     method: 'DELETE',
     headers: {
@@ -186,7 +199,7 @@ async function deleteToken(){
     },
     body: JSON.stringify(this.props.token),
   });
-}
+} */
 
 const styles = StyleSheet.create({
     button: {

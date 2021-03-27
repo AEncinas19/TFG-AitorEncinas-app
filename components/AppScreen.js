@@ -10,11 +10,17 @@ class AppScreen extends React.Component {
 
     render() {
         if (this.props.activated) {
+            if (this.props.locationdetected){
+                <AppDemo 
+                
+                />
+            }else{
             return (
                 <View style={{ flex:1, flexDirection: 'column', alignItems:'center', justifyContent:'space-around'}}>
                     <Text style={{flex:1, fontSize: 50 }}>Geolocation: LATITUD:{this.props.latitud} LONGITUD:{this.props.longitud} </Text> 
                 </View>
             )
+            }
         }
         else {
             return <View><Text>No place detected</Text></View>
