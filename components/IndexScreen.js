@@ -100,7 +100,7 @@ class IndexScreen extends React.Component {
       }
       else
         this.props.dispatch(activateSearch())
-        this.deleteToken()
+        //this.deleteToken()
     }
     else{
         return
@@ -166,7 +166,7 @@ class IndexScreen extends React.Component {
 }
 
 /* async function sendToken(){
-  await fetch('/pushtoken', {
+  let response = await fetch('/pushtoken', {
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -175,7 +175,10 @@ class IndexScreen extends React.Component {
     },
     body: JSON.stringify({pushtoken: this.props.token}),
   });
-} */
+
+  let responsed = await response.json();
+  console.log(responsed.success)
+}  */
 
 /* async function sendLocation(){
   await fetch('/location', {
