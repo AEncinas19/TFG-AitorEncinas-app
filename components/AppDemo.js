@@ -1,6 +1,7 @@
 import React from 'react';
 import {View, Image, Text, Modal, TouchableHighlight, TouchableOpacity, StyleSheet, Alert, SectionList} from "react-native";
-
+import TarjetaScreen from './TarjetaScreen';
+import {showCard} from '../redux/actions';
 
 
 
@@ -9,7 +10,7 @@ export default class App extends React.Component {
 
     constructor(props){
         super(props);
-        this.state = {modalVisible:false}
+        this.state = {modalVisible:false, money: 0, tarjetaVisible: false}
     }
 
     getOfferProducts = () => {
@@ -54,14 +55,16 @@ export default class App extends React.Component {
     }
 
     comprar = () => {
+        this.setState({money: this.calcularCompra()});
         let newShop = JSON.parse(JSON.stringify(this.props.shop))
         let placementsreformed = newShop.placements.map(item => {
             return {...item,
             quantity: 0}
           })
           newShop.placements = placementsreformed;
+         this.setState({tarjetaVisible: true});
+        
           this.props.onResetShop(newShop);
-          alert('Se ha realizado su compra correctamente');
     }
 
     extraerCarro = () => {
@@ -119,11 +122,20 @@ export default class App extends React.Component {
                         </View>
 
                     </Modal>
+                    <Modal animationType="slide" transparent={false} visible={this.state.tarjetaVisible}>
+                        <View>
+                            <TouchableHighlight style={{alignSelf:'flex-end'}} onPress={() => {this.setState({tarjetaVisible:false})}}>
+                                <Text style={{fontSize:20, marginBottom: 20, marginRight: 5}}>X</Text>
+                            </TouchableHighlight>
+                        </View>
+                        <TarjetaScreen money = {this.state.money}
+                            />
+                    </Modal>
                     <TouchableHighlight style={styles.comprarbutton} onPress = {() => {this.setModalVisible(true)}}>
                         <Text style={{alignSelf: 'center', justifyContent:'space-around', color:'white'}}>Ver carro y comprar</Text>
                     </TouchableHighlight>   
                 </View>
-        )
+            )
         }
         else {
             return(

@@ -33,3 +33,7 @@ export function addProduct(item){
 export function removeProduct(item){
     return {type: 'REMOVE_PRODUCT', payload:{item}}
 }
+
+export function arriveShops(shops){
+    return {type: 'ARRIVE_SHOPS', payload:{shops}}
+}

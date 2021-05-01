@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {connect, Provider} from 'react-redux';
 import {View, Image, Text, StyleSheet, Alert, TouchableHighlight} from "react-native";
 import AppDemo from './AppDemo';
+import Map from './Map';
 import {addProduct, arriveShop, removeProduct} from '../redux/actions';
 
 
@@ -23,9 +24,7 @@ class AppScreen extends React.Component {
                 )
             }else{
             return (
-                <View style={{ flex:1, flexDirection: 'column', alignItems:'center', justifyContent:'space-around'}}>
-                    <Text style={{flex:1, fontSize: 50 }}>Geolocation: LATITUD:{this.props.latitud} LONGITUD:{this.props.longitud} </Text> 
-                </View>
+                <Map />
             )
             }
         }

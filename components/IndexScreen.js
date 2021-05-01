@@ -1,14 +1,18 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {View, TouchableHighlight, Text, StyleSheet} from 'react-native';
-import { activateSearch, actualLocation, arriveToken, logging, localFound, arriveShop } from '../redux/actions';
+import { activateSearch, actualLocation, arriveToken, logging, localFound, arriveShop, arriveShops } from '../redux/actions';
 import { Alert, Platform } from 'react-native'
 import * as Permissions from 'expo-permissions';
 import * as Linking from 'expo-linking';
 import * as Notifications from 'expo-notifications';
 import * as Location from 'expo-location';
+import * as TaskManager from 'expo-task-manager';
+import axios from 'axios';
 
 import {baseURL} from '../consts/url';
+
+const LOCATION_TASK_NAME = 'background-location-tasks'
 
 const hasNotificationPermission = async () => {
   try {
@@ -84,14 +88,15 @@ class IndexScreen extends React.Component {
     hasGeolocationPermission()
     this.registerForPushNotificationsAsync()
     Notifications.addNotificationReceivedListener(notification => { 
-      console.log(notification)
       Alert.alert(notification.request.content.title, notification.request.content.body)
+      console.log(notification)
       this.props.navigation('App');
     })
     Notifications.addNotificationResponseReceivedListener( response => {
       console.log(response);
       this.props.navigation('App');
     }) /*cuando el usuario pulsa encima, cambia de pantalla*/
+    this.getShops()
     
     this.myInterval = setInterval(async () => {
       if (this.props.activated){
@@ -100,17 +105,28 @@ class IndexScreen extends React.Component {
         let EnableLocation = await checkIfLocationEnabled();
         if (Notpermission && Geopermission && EnableLocation){
           this.getPosition();
-          this.sendLocation();
-          console.log("Se ha activado")
         } //Si cambia algo de los permisos, se deja de enviar.
         else {return}
       }
-    }, 30000)
+    }, 5000)
+    this.myInterval2 = setInterval(async () => {
+      if (this.props.activated){
+        let Notpermission = await hasNotificationPermission();
+        let Geopermission = await hasGeolocationPermission();
+        let EnableLocation = await checkIfLocationEnabled();
+        if (Notpermission && Geopermission && EnableLocation){
+          this.sendLocation();
+        } //Si cambia algo de los permisos, se deja de enviar.
+        else {return}
+      }
+    }, 35000)
   }
 
   async componentWillUnmount(){
     clearInterval(this.myInterval)
+    clearInterval(this.myInterval2)
   }
+
 
   activate = async () => {
     let Notpermission = await hasNotificationPermission();
@@ -121,7 +137,18 @@ class IndexScreen extends React.Component {
         this.props.dispatch(activateSearch());
         this.getPosition();
         this.sendLocation();
-      }
+        const { status } = await Location.requestPermissionsAsync();
+        if (status === 'granted') {
+          console.log("Entra aquí")
+          await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
+            accuracy: Location.Accuracy.BalancedHighest,
+            timeInterval: 10000,
+            foregroundService: {
+              notificationTitle: "BackgroundLocation Is On",
+              notificationBody: 'To turn off, go back to the app and switch something off.',
+          }});
+        }
+    }
       else
         this.props.dispatch(activateSearch())
         if (this.props.locationdetected)
@@ -132,33 +159,6 @@ class IndexScreen extends React.Component {
         return
     }
   }
-
-    render() {
-      if (this.props.logged){
-        return(
-            <View style={{ flex:1, flexDirection: 'column', alignItems:'center', justifyContent:'space-around'}}>
-                <Text style={{flex:1, fontSize: 35 }}> Welcome {this.props.username} to this demo App </Text> 
-                <Text style={{flex:1, fontSize: 35 }}> Press  'Start Search'</Text> 
-                <Text style={{flex:1, fontSize: 20 }}> Your expo push token: {this.props.token}</Text> 
-                <Text style={{flex:1, fontSize: 20 }}> Geolocation & Push notifications: {this.props.activated? "true" : "false"} </Text> 
-                <TouchableHighlight style={styles.button} onPress = {() => this.activate()}>
-                    <Text> {this.props.activated ? "Stop Search" : "Start Search"}</Text>
-                </TouchableHighlight>
-                <TouchableHighlight style={styles.button} onPress = {() => this.logout()}>
-                    <Text>Logout</Text>
-                </TouchableHighlight>
-            </View>
-        )
-        }
-        else{
-          return(
-            <View style={{ flex:1, flexDirection: 'column', alignItems:'center', justifyContent:'space-around'}}>
-                <Text style={{flex:1, fontSize: 35 }}> You need to be logged </Text> 
-            </View>
-          )
-        }
-    }
-
 
   async registerForPushNotificationsAsync() {
     try{
@@ -206,9 +206,6 @@ class IndexScreen extends React.Component {
       body: JSON.stringify({pushtoken: token}),
     });
   
-    let responsed = await response.json();
-    console.log(responsed)
-    console.log(response.status)
     if (response.status == 401){
       alert('La sesión ha finalizado por exceso de espera. Vuelva a hacer Log in.')
       this.props.dispatch(logging(''));
@@ -282,33 +279,114 @@ class IndexScreen extends React.Component {
 
   }
 
+  async getShops() {
+    let response = await fetch(baseURL+'/getshops', {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Accept-encoding': 'gzip, deflate',
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.status == 200){
+      let responsed = await response.json();
+      this.props.dispatch(arriveShops(responsed.shops))
+      console.log(this.props.shops)
+    }
+    else{
+      return
+    }
+  }
+
+  render() {
+    if (this.props.logged){
+      return(
+          <View style={styles.container}>
+              <Text style={{alignSelf: 'flex-start', color:"#d9931c", fontSize: 25}}> Bienvenido, </Text> 
+              <Text style={styles.usernametext}> {this.props.username}</Text> 
+              <Text style={{alignSelf: 'flex-end', color:"#d9931c", fontSize: 25}}> a esta App </Text> 
+            <View style={{marginTop:100}}>
+              <Text style={{color:"#d9931c",fontSize: 25, textAlign: 'center'}}> Pulsa 'Empezar búsqueda' para encontrar tu tienda </Text>
+            </View> 
+              <TouchableHighlight style={styles.startBtn} onPress = {() => this.activate()}>
+                  <Text style={styles.loginText}>{this.props.activated ? "Parar búsqueda" : "Empezar búsqueda"}</Text>
+              </TouchableHighlight>
+              <TouchableHighlight style={styles.logoutBtn} onPress = {() => this.logout()}>
+                  <Text style={styles.loginText}>Logout</Text>
+              </TouchableHighlight>
+          </View>
+      )
+      }
+      else{
+        return(
+          <View style={{ flex:1, flexDirection: 'column', alignItems:'center', justifyContent:'space-around'}}>
+              <Text style={{flex:1, fontSize: 35 }}> You need to be logged </Text> 
+          </View>
+        )
+      }
+  }
 }
 
-/* async function deleteToken(){
-  await fetch('', {
-    method: 'DELETE',
-    headers: {
-      Accept: 'application/json',
-      'Accept-encoding': 'gzip, deflate',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(this.props.token),
-  });
-} */
+TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data: {locations}, error }) => {
+  if (error) {
+    // Error occurred - check `error.message` for more details.
+    return;
+  }
+  const [location] = locations;
+  console.log(location);
+  try{
+    await axios.post(baseURL+'/location', {location})
+  }catch (err) {
+    console.log(err)
+  }
+}); 
+
 
 const styles = StyleSheet.create({
-    button: {
-        height: 60,
-        width: 100,
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        backgroundColor: 'red',
-        fontSize: 25,
-        textAlign: 'center',
-        padding: 10
+  container: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: 'white',
+  },
+  text:{
+      color:"#d9931c",
+      fontSize: 25,
+      alignSelf:'flex-start'
+  },
+  usernametext:{
+    color:"#465881",
+    fontSize: 30,
+    fontWeight: "bold"
+  },
+  startBtn:{
+      width:"80%",
+      backgroundColor:"#465881",
+      borderRadius:25,
+      height:50,
+      alignItems:"center",
+      justifyContent:"center",
+      marginTop:150,
+      marginBottom:10,
+    },
+  logoutBtn:{
+    width:"80%",
+    backgroundColor:"darkgray",
+    borderRadius:25,
+    height:50,
+    alignItems:"center",
+    justifyContent:"center",
+    marginTop:30,
+
+  },
+  loginText:{
+      color:"white",
+      fontSize:20
     }
+
 }
-    );
+);
 
 function mapStateToProps(state) {
     return {

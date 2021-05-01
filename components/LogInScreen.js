@@ -1,5 +1,5 @@
 import React from 'react';
-import{ View, TextInput, TouchableHighlight, StyleSheet, Text } from'react-native';
+import{ View, TextInput, TouchableHighlight, StyleSheet, Text, TouchableOpacity } from'react-native';
 
 import {baseURL} from '../consts/url';
 
@@ -60,20 +60,34 @@ export default class LogInScreen extends React.Component{
 
     render(){
         return(
-            <View style={{ flex:1, flexDirection:'column', alignItems:'center', justifyContent:'center' }}>
-                <Text>Username:</Text>
-                <TextInput ref={inputName => {this.TextInputName = inputName}} style={{height:70, alignSelf:'center', fontSize:25, padding:5}}onChangeText={this.onUserNameChange}/>
-                <Text>Password:</Text>
-                <TextInput ref={inputPassword => {this.TextInputPassword = inputPassword}} style={{height:70, alignSelf:'center', fontSize:25, padding:5}} secureTextEntry={this.state.passwordvisible} onChangeText={this.onPasswordChange}/>
-                <TouchableHighlight style={styles.button2} onPress = {() => this.showPassword()}>
-                <Text style={{alignSelf: 'center', justifyContent:'space-around', color:'white'}}>{this.state.passwordvisible ? "Ver" : "Ocultar"}</Text>
+            //<View style={{ flex:1, flexDirection:'column', alignItems:'center', justifyContent:'center' }}> style={{height:70, alignSelf:'center', fontSize:25, padding:5}}
+            <View style={styles.container}>
+                <View style={styles.inputView} >
+                    <TextInput  
+                        ref={inputName => {this.TextInputName = inputName}}
+                        style={styles.inputText}
+                        placeholder="Username..." 
+                        placeholderTextColor="white"
+                        onChangeText={this.onUserNameChange}/>
+                </View>
+                <View style={styles.inputView} >
+                    <TextInput  
+                        ref={inputPassword => {this.TextInputPassword = inputPassword}}
+                        style={styles.inputText}
+                        placeholder="Password..." 
+                        placeholderTextColor="white"
+                        onChangeText={this.onPasswordChange}
+                        secureTextEntry={this.state.passwordvisible}/>
+                </View>
+                <TouchableHighlight onPress = {() => this.showPassword()}>
+                <Text style={{alignSelf: 'center', justifyContent:'space-around', color:'black'}}>{this.state.passwordvisible ? "Ver contraseña" : "Ocultar contraseña"}</Text>
                 </TouchableHighlight>
-                <TouchableHighlight style={styles.button} onPress = {() => this.sendToServer()}>
-                    <Text>Log In</Text>
-                </TouchableHighlight>
-                <TouchableHighlight style={styles.button} onPress = {() => this.props.onChangeState()}>
-                    <Text>Sign In</Text>
-                </TouchableHighlight>
+                <TouchableOpacity style={styles.loginBtn} onPress = {() => this.sendToServer()}>
+                    <Text style={styles.loginText}>LogIn</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress = {() => this.props.onChangeState()}>
+                    <Text style={{color:"black", fontSize:15, margin:10}}>SignUp</Text>
+                </TouchableOpacity>
             </View>
         )
     }
@@ -83,26 +97,39 @@ export default class LogInScreen extends React.Component{
 
 
 const styles = StyleSheet.create({
-    button: {
-        height: 60,
-        width: 100,
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        backgroundColor: 'green',
-        fontSize: 25,
-        textAlign: 'center',
-        padding: 10,
-        margin: 10
+    container: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'white',
     },
-    button2: {
-        height: 30,
-        width: 80,
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        backgroundColor: 'black',
-        fontSize: 9,
-        textAlign: 'center',
-        padding: 10
-    }
+    inputView:{
+        width:"80%",
+        backgroundColor:"#465881",
+        borderRadius:25,
+        height:50,
+        marginBottom:20,
+        justifyContent:"center",
+        padding:20
+    },
+      inputText:{
+        height:50,
+        color:"white"
+    },
+    loginBtn:{
+        width:"80%",
+        backgroundColor:"#d9931c",
+        borderRadius:25,
+        height:50,
+        alignItems:"center",
+        justifyContent:"center",
+        marginTop:100,
+        marginBottom:10,
+      },
+    loginText:{
+        color:"white",
+        fontSize:20
+      }
+
 }
-    );
+);

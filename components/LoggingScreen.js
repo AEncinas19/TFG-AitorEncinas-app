@@ -40,12 +40,15 @@ class LoggingScreen extends React.Component {
             }
             else{
                 return (
-                    <View style={{flex:1, flexDirection:'row', alignItems:'center', justifyContent:'center' }}>
-                        <TouchableHighlight style={styles.button} onPress = {() => this.props.dispatch(stateLog("LOGIN"))}>
-                            <Text>Log In</Text>
+                    <View style={styles.container}>
+                        <Image source={require('../assets/LOGO_ESCUELA.png')}/>
+                        <Text style={{color:"black",fontSize:10,margin:5}}>Realizada por Aitor Encinas Alonso</Text>
+                        <View style={{margin:70}}></View>
+                        <TouchableHighlight style={styles.loginBtn} onPress = {() => this.props.dispatch(stateLog("LOGIN"))}>
+                            <Text style={styles.loginText}>LogIn</Text>
                         </TouchableHighlight>
-                        <TouchableHighlight style={styles.button} onPress = {() => this.props.dispatch(stateLog("SIGNIN"))}>
-                            <Text>Sign In</Text>
+                        <TouchableHighlight style={styles.loginBtn} onPress = {() => this.props.dispatch(stateLog("SIGNIN"))}>
+                            <Text style={styles.loginText}>SignUp</Text>
                         </TouchableHighlight>
                     </View>
                 )
@@ -55,16 +58,26 @@ class LoggingScreen extends React.Component {
 }
 
 const styles = StyleSheet.create({
-    button: {
-        height: 60,
-        width: 100,
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        backgroundColor: 'green',
-        fontSize: 25,
-        textAlign: 'center',
-        padding: 10
-    }
+    container: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'white',
+    },
+    loginBtn:{
+        width:"80%",
+        backgroundColor:"#d9931c",
+        borderRadius:25,
+        height:50,
+        alignItems:"center",
+        justifyContent:"center",
+        marginTop:20,
+        marginBottom:10,
+      },
+    loginText:{
+        color:"white",
+        fontSize:20
+      }
 }
     );
 

@@ -26,7 +26,8 @@ export default class ReduxProvider extends React.Component {
             logState: "",
             logged: false,
             username: "",
-            shop: {}
+            shop: {},
+            shops: {}
         };
         this.store = this.configureStore();
     }

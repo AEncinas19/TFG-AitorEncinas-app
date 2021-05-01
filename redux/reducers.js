@@ -95,6 +95,15 @@ function shop(state = {}, action = {}){
     }
 }
 
+function shops(state = {}, action = {}){
+    switch(action.type){
+        case 'ARRIVE_SHOPS':
+            return action.payload.shops;
+        default:
+            return state;
+    }
+}
+
 const GlobalState = (combineReducers({
     activated,
     longitud,
@@ -104,7 +113,8 @@ const GlobalState = (combineReducers({
     logState,
     logged,
     username,
-    shop
+    shop,
+    shops
 }));
 
 export default GlobalState;
