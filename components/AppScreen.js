@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {connect, Provider} from 'react-redux';
 import {View, Image, Text, StyleSheet, Alert, TouchableHighlight} from "react-native";
-import AppDemo from './AppDemo';
+import App from './AppDemo';
 import Map from './Map';
 import {addProduct, arriveShop, removeProduct} from '../redux/actions';
 
@@ -15,7 +15,7 @@ class AppScreen extends React.Component {
             if (this.props.locationdetected){
                 return(
                     <View style= {{flex:1}} className="IndexScreen">
-                        <AppDemo shop = {this.props.shop}
+                        <App shop = {this.props.shop}
                                  onAddProduct = {(product) => {this.props.dispatch(addProduct(product))}}
                                  onRemoveProduct = {(product) => {this.props.dispatch(removeProduct(product))}}
                                  onResetShop = {(shop) => {this.props.dispatch(arriveShop(shop))}}

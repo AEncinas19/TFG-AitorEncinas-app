@@ -30,7 +30,7 @@ export default class LogInScreen extends React.Component{
 
     showConfirmPassword = () => {
         this.setState({
-            passwordvisible: !this.state.confirmpasswordvisible
+            confirmpasswordvisible: !this.state.confirmpasswordvisible
         })
     }
 
@@ -102,11 +102,11 @@ export default class LogInScreen extends React.Component{
                         style={styles.inputText}
                         placeholder="Confirm Password..." 
                         placeholderTextColor="white"
-                        onChangeText={this.onPasswordChange}
-                        secureTextEntry={this.state.passwordvisible}/>
+                        onChangeText={this.onConfirmPasswordChange}
+                        secureTextEntry={this.state.confirmpasswordvisible}/>
                 </View>
-                <TouchableHighlight style={{marginBottom: 20}} onPress = {() => this.showPassword()}>
-                <Text style={{alignSelf: 'center', justifyContent:'space-around', color:'black'}}>{this.state.passwordvisible ? "Ver contraseña" : "Ocultar contraseña"}</Text>
+                <TouchableHighlight style={{marginBottom: 20}} onPress = {() => this.showConfirmPassword()}>
+                <Text style={{alignSelf: 'center', justifyContent:'space-around', color:'black'}}>{this.state.confirmpasswordvisible ? "Ver contraseña" : "Ocultar contraseña"}</Text>
                 </TouchableHighlight>
                 <TouchableOpacity style={styles.loginBtn} onPress = {() => this.registerToServer()}>
                     <Text style={styles.loginText}>SignUp</Text>

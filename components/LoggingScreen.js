@@ -1,8 +1,7 @@
-import React, { Component } from 'react';
-import {connect, Provider} from 'react-redux';
-import {View, Image, Text, StyleSheet, Alert, TouchableHighlight} from "react-native";
+import React from 'react';
+import {connect} from 'react-redux';
+import {View, Image, Text, StyleSheet, TouchableHighlight} from "react-native";
 
-import{NavigationContainer} from '@react-navigation/native';
 //import {SafeAreaView} from "react-native-safe-area-context";
 
 import { logging, stateLog } from '../redux/actions';

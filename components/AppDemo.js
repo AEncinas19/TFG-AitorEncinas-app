@@ -1,7 +1,8 @@
 import React from 'react';
 import {View, Image, Text, Modal, TouchableHighlight, TouchableOpacity, StyleSheet, Alert, SectionList} from "react-native";
 import TarjetaScreen from './TarjetaScreen';
-import {showCard} from '../redux/actions';
+import Product from './Product';
+import { WebView } from 'react-native-webview';
 
 
 
@@ -10,7 +11,7 @@ export default class App extends React.Component {
 
     constructor(props){
         super(props);
-        this.state = {modalVisible:false, money: 0, tarjetaVisible: false}
+        this.state = {modalVisible:false, money: 0, tarjetaVisible: false, receipt: "", receiptVisible: false}
     }
 
     getOfferProducts = () => {
@@ -88,21 +89,19 @@ export default class App extends React.Component {
         if (this.props.shop.name){
             return(
                 <View style={{ flex:1, flexDirection: 'column', alignItems:'center', justifyContent:'space-around'}}>
-                    <Text style={{fontSize: 50 }}>Estás en la tienda: {this.props.shop.name} </Text>
+                    <Text style={{fontSize: 20 }}>Estás en la tienda: {this.props.shop.name} </Text>
                     <SectionList 
                         sections={[{data: this.getOfferProducts(), title: 'Productos en oferta'}, {data: this.getNoOfferProducts(), title: 'Resto de productos'}]}
-                        renderItem={({item}) =>   <View style={{ flex:1, flexDirection: 'column', alignItems:'center', justifyContent:'space-around'}}>
-                                                        <Text style={{fontSize:25}}>{item.productname}</Text>
-                                                        <Text style={{fontSize:15}}>{item.price + '€'}</Text>
-                                                        <TouchableHighlight style={styles.button} onPress = {() => {this.addProduct(item)}}>
-                                                            <Text>+</Text>
-                                                        </TouchableHighlight>
-                                                        <Text>{item.quantity}</Text>
-                                                        <TouchableHighlight style={styles.button} onPress = {() => {this.removeProduct(item)}}>
-                                                            <Text>-</Text>
-                                                        </TouchableHighlight>
-                                                        </View>}
-                        renderSectionHeader={({section}) => <Text style={{textAlign:'center', fontSize:35, backgroundColor: 'yellow', padding:10, margin:5}}>{section.title}
+                        renderItem={({item}) =>   <Product 
+                                                        price = {item.price}
+                                                        quantity = {item.quantity}
+                                                        productname = {item.productname}
+                                                        onAddProduct = {() => this.addProduct(item)}
+                                                        onRemoveProduct = {() => this.removeProduct(item)}
+                                                        url = {item.url}
+                        />
+                        }
+                        renderSectionHeader={({section}) => <Text style={{textAlign:'center', color: '#465881', fontSize:30, padding:10, margin:5}}>{section.title}
                                                             </Text>}
                     />
                     <Modal animationType="slide" transparent={false} visible={this.state.modalVisible}>
@@ -129,11 +128,34 @@ export default class App extends React.Component {
                             </TouchableHighlight>
                         </View>
                         <TarjetaScreen money = {this.state.money}
+                                        ontarjetaVisible = {() => {this.setState({tarjetaVisible:false})}}
+                                        onmodalVisible = {()=> {this.setState({modalVisible: false})}}
+                                        onreceiptVisible = {() => {this.setState({receiptVisible: true})}}
+                                        onreceipt = {(url) => {this.setState({receipt: url})}}
                             />
                     </Modal>
-                    <TouchableHighlight style={styles.comprarbutton} onPress = {() => {this.setModalVisible(true)}}>
-                        <Text style={{alignSelf: 'center', justifyContent:'space-around', color:'white'}}>Ver carro y comprar</Text>
-                    </TouchableHighlight>   
+                    <Modal animationType="slide" transparent={false} visible={this.state.receiptVisible}>
+                        <TouchableHighlight style={{alignSelf:'flex-end'}} onPress={() => {this.setState({receiptVisible:false})}}>
+                            <Text style={{fontSize:20, marginBottom: 20, marginRight: 5}}>X</Text>
+                        </TouchableHighlight>
+                        <WebView source={{ uri: this.state.receipt}} style={{marginTop:5}} />
+                    </Modal>
+                    <View style={{
+                    width: 280,
+                    marginTop: 10,
+                    marginBottom: 20,
+                    backgroundColor: 'black',
+                    borderRadius: 60,
+                    }}>
+                        <TouchableOpacity onPress={()=>this.setModalVisible(true)}>
+                            <Text style={{
+                                textAlign: 'center',
+                                fontSize: 17,
+                                color: 'white',
+                                paddingVertical: 15
+                            }}>Ver carro y comprar</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             )
         }

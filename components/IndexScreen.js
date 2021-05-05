@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
       height:50,
       alignItems:"center",
       justifyContent:"center",
-      marginTop:150,
+      marginTop:120,
       marginBottom:10,
     },
   logoutBtn:{
