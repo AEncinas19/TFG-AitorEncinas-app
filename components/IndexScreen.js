@@ -119,7 +119,7 @@ class IndexScreen extends React.Component {
         } //Si cambia algo de los permisos, se deja de enviar.
         else {return}
       }
-    }, 35000)
+    }, 20000)
   }
 
   async componentWillUnmount(){

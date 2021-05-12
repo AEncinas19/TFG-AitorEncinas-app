@@ -29,7 +29,10 @@ class AppScreen extends React.Component {
             }
         }
         else {
-            return <View><Text>No place detected</Text></View>
+            return  <View style={{flex:1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white'}}>
+                        <Image source={require('../assets/no-site.png')}/>
+                        <Text>Empieza la búsqueda para buscar tienda</Text>
+                    </View>
         } 
     }
 }

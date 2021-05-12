@@ -1,35 +1,33 @@
 import React, { Component } from 'react';
-import { Image } from 'react-native';
-import { Container, Header, Content, Card, CardItem, TouchableHighlight, Text, Button, Icon, Left, Body, Right } from 'native-base';
+import { Image, StyleSheet, Dimensions } from 'react-native';
+import { Container, Header, Content, Card, CardItem, Text, Button, Left, Body, Right } from 'native-base';
+
 export default class Product extends Component {
 
   render() {
     return (
-      <Container style={{height: 460}}>
-        <Header />
+      <Container style={{height: 200}}>
         <Content>
           <Card>
             <CardItem>
               <Left>
                 <Body>
-                  <Text>{this.props.productname}</Text>
+                  <Image source={{uri: this.props.url}} style={styles.card}/> 
                 </Body>
               </Left>
             </CardItem>
             <CardItem cardBody>
-              <Image source={{uri: this.props.url}} style={{height: 200, width: null, flex: 1}}/>
+            <Text>{this.props.productname}</Text>
+            <Text style={{marginTop:100}}> Precio por unidad: +{this.props.price + '€'}</Text>
             </CardItem>
             <CardItem>
-              <Left>
-                  <Text> Precio por unidad: +{this.props.price + '€'}</Text>
-              </Left>
               <Right>                                                        
-                  <Button onPress = {() => {this.props.onAddProduct()}}>
-                    <Text>+</Text>
+                  <Button style={{height:40, width:40}} onPress = {() => {this.props.onAddProduct()}}>
+                    <Text style={{fontSize:15}}>+</Text>
                   </Button>
-                  <Text>{this.props.quantity}</Text>
-                  <Button onPress = {() => {this.props.onRemoveProduct()}}>
-                    <Text>-</Text>
+                  <Text style={{alignSelf: 'center', marginLeft: 70}}>{this.props.quantity}</Text>
+                  <Button style={{height:40, width:40}} onPress = {() => {this.props.onRemoveProduct()}}>
+                    <Text style={{alignSelf: 'center', fontSize:30}}>-</Text>
                   </Button>
               </Right>
             </CardItem>
@@ -39,3 +37,7 @@ export default class Product extends Component {
     );
   }
 }
+
+const styles = StyleSheet.create({
+  card: {height: 200, width: Dimensions.get('window').width/3, flex: 1}
+});

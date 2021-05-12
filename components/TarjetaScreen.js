@@ -34,7 +34,6 @@ export default class TarjetaScreen extends React.Component {
                 cvc: this.state.data.cvc
             }
         }
-        console.log(params.number)
         const card = await stripe.createToken(params)
         const token = card.id //Es lo que tengo que pasar en el backend.
         let response = await fetch(baseURL+'/pay', {
@@ -48,16 +47,12 @@ export default class TarjetaScreen extends React.Component {
         });
 
         let responsed = await response.json();
-        console.log(responsed)
-        console.log(response.status)
 
         if (response.status == 200){
-            console.log(response)
             this.props.ontarjetaVisible()
             this.props.onmodalVisible()
             this.props.onreceiptVisible()
             this.props.onreceipt(responsed.charge.receipt_url)
-            console.log(responsed.charge.receipt_url)
             alert ("Pago realizado satisfactoriamente")
         }
     }
