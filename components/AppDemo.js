@@ -91,7 +91,7 @@ export default class App extends React.Component {
     render() {
         if (this.props.shop.name){
             return(
-                <View style={{ flex:1, flexDirection:'column', alignItems:'center', marginTop:30}}>
+                <View style={{ flex:1, flexDirection:'column', alignItems:'center', marginTop:20}}>
                     <LinearGradient
                         start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
                         colors={['#d9931c', 'transparent']}
@@ -99,7 +99,7 @@ export default class App extends React.Component {
                     >
                     <View style={{flexDirection:'row', justifyContent:'space-around', alignItems:'center', marginTop:5}}>
                         <FontAwesome5 name="store-alt" size={24} color="black" />
-                        <Text style={{fontSize: 24, color:'black'}}>{this.props.shop.name}</Text>
+                        <Text style={{fontSize: 24, color:'black'}}> {this.props.shop.name}</Text>
                     </View>
                     <View style={{flexDirection:'row', marginTop:40, marginBottom:25, justifyContent:'space-around', alignItems:'center'}}>
                         <Text style={{fontSize:20, fontWeight:'bold', marginRight:20, textDecorationLine: this.state.verofertas ? 'underline' : 'none'}} onPress={() => {this.setState({verofertas:true})}}>Ofertas</Text>

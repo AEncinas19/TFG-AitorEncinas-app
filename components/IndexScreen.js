@@ -1,18 +1,21 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import {View, TouchableHighlight, Text, StyleSheet} from 'react-native';
-import { activateSearch, actualLocation, arriveToken, logging, localFound, arriveShop, arriveShops } from '../redux/actions';
-import { Alert, Platform } from 'react-native'
+import {View, TouchableHighlight, Text, StyleSheet, Dimensions} from 'react-native';
+import { activateSearch, actualLocation, arriveToken, logging, localFound, arriveShop, arriveShops, setBackground } from '../redux/actions';
+import { Alert, Platform} from 'react-native'
 import * as Permissions from 'expo-permissions';
 import * as Linking from 'expo-linking';
 import * as Notifications from 'expo-notifications';
 import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
 import axios from 'axios';
+import { AntDesign } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+
 
 import {baseURL} from '../consts/url';
 
-const LOCATION_TASK_NAME = 'background-location-tasks'
+const LOCATION_TASK_NAME = 'background-location-task'
 
 const hasNotificationPermission = async () => {
   try {
@@ -139,25 +142,49 @@ class IndexScreen extends React.Component {
         this.sendLocation();
         const { status } = await Location.requestPermissionsAsync();
         if (status === 'granted') {
-          console.log("Entra aquí")
+          TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
+            if (error) {
+              // Error occurred - check `error.message` for more details.
+              console.log(error)
+              Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
+              return;
+            }
+            const {locations} = data;
+            console.log(locations);
+            let response = await axios({
+              method: 'post',
+              url: baseURL+'/backlocation',
+              headers: {}, 
+              data: {
+                latitud: locations[0].coords.latitude, // This is the body part
+                longitud: locations[0].coords.longitude
+              }
+            });
+            console.log(response)
+            if (response.data.finish) {Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
+              TaskManager.unregisterAllTasksAsync()}
+          }); 
           await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-            accuracy: Location.Accuracy.BalancedHighest,
             timeInterval: 10000,
+            deferredUpdatesInterval: 5000, 
             foregroundService: {
               notificationTitle: "BackgroundLocation Is On",
-              notificationBody: 'To turn off, go back to the app and switch something off.',
           }});
         }
-    }
-      else
+      }
+      else {
+        Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
+        TaskManager.unregisterAllTasksAsync()
         this.props.dispatch(activateSearch())
-        if (this.props.locationdetected)
+        if (this.props.locationdetected){
           this.props.dispatch(localFound());
         //this.deleteToken()
+        }
+      }
     }
-    else{
-        return
-    }
+      else{
+          return
+      }
   }
 
   async registerForPushNotificationsAsync() {
@@ -292,7 +319,6 @@ class IndexScreen extends React.Component {
     if (response.status == 200){
       let responsed = await response.json();
       this.props.dispatch(arriveShops(responsed.shops))
-      console.log(this.props.shops)
     }
     else{
       return
@@ -303,18 +329,23 @@ class IndexScreen extends React.Component {
     if (this.props.logged){
       return(
           <View style={styles.container}>
-              <Text style={{alignSelf: 'flex-start', color:"#d9931c", fontSize: 25}}> Bienvenido, </Text> 
-              <Text style={styles.usernametext}> {this.props.username}</Text> 
-              <Text style={{alignSelf: 'flex-end', color:"#d9931c", fontSize: 25}}> a esta App </Text> 
-            <View style={{marginTop:100}}>
-              <Text style={{color:"#d9931c",fontSize: 25, textAlign: 'center'}}> Pulsa 'Empezar búsqueda' para encontrar tu tienda </Text>
-            </View> 
+            <LinearGradient
+                start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+                colors={['#d9931c', 'transparent']}
+                style={styles.background}>
+              <View style={{flexDirection:'row', alignSelf:'flex-start', marginTop:40, marginLeft: 10}}>
+                <AntDesign name="user" size={30} color="black" />
+                <Text style={{fontSize: 24, color:'black'}}> {this.props.username}</Text>
+              </View>
+              <Text style={{alignSelf: 'center', color:"black", fontSize: 25, marginTop:40}}> ¡Bienvenido a esta Aplicación!</Text> 
+              <Text style={{color:"black",fontSize: 25, textAlign: 'center', marginTop:50}}> Pulsa 'Empezar búsqueda' para encontrar tu tienda </Text>
               <TouchableHighlight style={styles.startBtn} onPress = {() => this.activate()}>
                   <Text style={styles.loginText}>{this.props.activated ? "Parar búsqueda" : "Empezar búsqueda"}</Text>
               </TouchableHighlight>
               <TouchableHighlight style={styles.logoutBtn} onPress = {() => this.logout()}>
                   <Text style={styles.loginText}>Logout</Text>
               </TouchableHighlight>
+            </LinearGradient>
           </View>
       )
       }
@@ -328,37 +359,12 @@ class IndexScreen extends React.Component {
   }
 }
 
-TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data: {locations}, error }) => {
-  if (error) {
-    // Error occurred - check `error.message` for more details.
-    return;
-  }
-  const [location] = locations;
-  console.log(location);
-  try{
-    await axios.post(baseURL+'/location', {location})
-  }catch (err) {
-    console.log(err)
-  }
-}); 
-
 
 const styles = StyleSheet.create({
   container: {
       flex: 1,
       alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: 'white',
-  },
-  text:{
-      color:"#d9931c",
-      fontSize: 25,
-      alignSelf:'flex-start'
-  },
-  usernametext:{
-    color:"#465881",
-    fontSize: 30,
-    fontWeight: "bold"
+      marginTop: 20
   },
   startBtn:{
       width:"80%",
@@ -383,7 +389,13 @@ const styles = StyleSheet.create({
   loginText:{
       color:"white",
       fontSize:20
-    }
+  },
+  background: {
+    alignItems:'center', justifyContent:'space-around', 
+    left: 0,
+    top: 0,
+    width: Dimensions.get('window').width,
+  }
 
 }
 );

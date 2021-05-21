@@ -45,7 +45,8 @@
     "stripe-client": "^1.1.5",
     "symbol-observable": "^4.0.0",
     "tipsi-stripe": "^9.0.0",
-    "expo-linear-gradient": "~8.4.0"
+    "expo-linear-gradient": "~8.4.0",
+    "expo-background-fetch": "~8.6.0"
   },
   "devDependencies": {
     "@babel/core": "~7.9.0",
